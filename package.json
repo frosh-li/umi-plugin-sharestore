@@ -4,9 +4,9 @@
     "@babel/parser": "^7.6.4",
     "@babel/traverse": "^7.6.3"
   },
-  "name": "sharestore",
+  "name": "umi-plugin-sharestore",
   "description": "umi plugin sharestore",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "devDependencies": {},
   "scripts": {
