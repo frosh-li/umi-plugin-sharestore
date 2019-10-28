@@ -2,7 +2,19 @@
   "dependencies": {
     "@babel/generator": "^7.6.4",
     "@babel/parser": "^7.6.4",
-    "@babel/traverse": "^7.6.3",
-    "recast": "^0.18.5"
+    "@babel/traverse": "^7.6.3"
+  },
+  "name": "sharestore",
+  "description": "umi plugin sharestore",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "lijunliang",
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/frosh-li/umi-plugin-sharestore"
   }
 }
