@@ -38,35 +38,44 @@ class _DvaContainer {
 }
 `;
 
-export default function (api, options) {
-
-  api.onBuildSuccess(({ stats }) => {
-    // handle with stats
-    console.log('after build success')
-    let projectDir = api.service.cwd;
-    const envPath = process.env.NODE_ENV === 'prod' ? '.umi-production' : '.umi';
-    const dvaFilePath = path.join(projectDir, `src/pages/${envPath}/dva.js`);
-    let dvaCode = fs.readFileSync(dvaFilePath, 'utf-8');
-    let ast = parser.parse(dvaCode, {
-      // parse in strict mode and allow module declarations
-      sourceType: "module",
-    
-      plugins: [
-        // enable jsx and flow syntax
-        "jsx",
-        "flow",
-        'react',
-      ]
-    });
-    traverse(ast, {
-      ExportNamedDeclaration: function(nodePath) {
-        if(nodePath.node.declaration.id.name === '_DvaContainer') {
-          const _ast = parser.parse(code);
-          nodePath.node.declaration.body = _ast.program.body[0].body;
-          fs.writeFileSync(dvaFilePath, generate(ast).code);
-          console.log('rebuild dva.js');
-        }
-      }
-    })
+function build(api, envPath = ".umi-production") {
+  // handle with stats
+  api.log.success('before build success', envPath)
+  let projectDir = api.service.cwd;
+  const dvaFilePath = path.join(projectDir, `src/pages/${envPath}/dva.js`);
+  if(!fs.existsSync(dvaFilePath)) {
+    api.log.success("can't find the file", dvaFilePath)
+    return;
+  }
+  let dvaCode = fs.readFileSync(dvaFilePath, 'utf-8');
+  let ast = parser.parse(dvaCode, {
+    // parse in strict mode and allow module declarations
+    sourceType: "module",
+  
+    plugins: [
+      // enable jsx and flow syntax
+      "jsx",
+      "flow",
+      'react',
+    ]
   });
+  traverse(ast, {
+    ExportNamedDeclaration: function(nodePath) {
+      if(nodePath.node.declaration.id.name === '_DvaContainer') {
+        const _ast = parser.parse(code);
+        nodePath.node.declaration.body = _ast.program.body[0].body;
+        fs.writeFileSync(dvaFilePath, generate(ast).code);
+        api.log.success('rebuild dva.js');
+      }
+    }
+  })
+}
+export default function (api, options) {
+  // 如果是运行umi build 执行这一块的代码
+  api.beforeBuildCompileAsync(async() => {
+      build(api, ".umi-production");
+  });
+  api.afterDevServer(() => {
+      build(api, ".umi");
+  })
 }
